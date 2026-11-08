@@ -23,7 +23,7 @@ int main(int argc, char *argv[]) {
     long N = 1/h + 1;
     long array_size = N/size;
     long rem = N % size;
-    long steps = (long)(T/tau + 0.05);
+    long steps = (long)(T/tau + 0.5);
     long local_size = 2 + array_size + (myrank < rem ? 1 : 0);
 
     //malloc for o(1) pointer swap
