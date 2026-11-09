@@ -2,9 +2,19 @@
 #include<stdlib.h>
 #include<mpi.h>
 #include<math.h>
+#define PI = 3.14159265358979323846
 
 static double u_newtime(double u, double u_previous, double u_next, double k_const, double tau_const, double h_const){
     return u + (k_const * tau_const / (h_const * h_const)) * (u_next - 2 * u + u_previous);
+}
+
+static double u_exact(double x, double t, double k_const) {
+    double sum = 0.0;
+    for (int m = 0; m < 100; m++) {
+        double n = 2 * m + 1;
+        sum += 4.0 / (n * PI) * sin(n * PI * x) * exp(-k_const * n * n * PI * PI * t);
+    }
+    return sum;
 }
 
 int main(int argc, char *argv[]) {
@@ -109,9 +119,15 @@ int main(int argc, char *argv[]) {
     for (long g = 0; g < N; g += 5) {
         if (g >= start && g < start + owned_points) {
             long j = g - start + 1;
-            printf("%ld %.6f %.12f\n", g, g * h, u_local[j]);
+            double ue = u_exact(g * h, T, k);
+            printf("%ld %.6f %.12f %.12f %.3e\n", g, g * h, u_local[j], ue, fabs(u_local[j] - ue));
         }
     }
+
+    //Exact solution
+    double u_local_exact[local_size-2];
+
+    for 
 
     free(u_local);
     free(u_local_new);
