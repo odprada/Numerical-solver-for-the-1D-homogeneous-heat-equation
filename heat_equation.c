@@ -38,7 +38,7 @@ int main(int argc, char *argv[]) {
         u_local[i] = 1;
     }
 
-    //boundary condition prevails at (0,0) making the value at the endpoints zero at any time
+    //Zero boundary conditions
     if (myrank == 0){
         u_local[1] = 0;
         u_local_new[1] = 0;
@@ -89,19 +89,28 @@ int main(int argc, char *argv[]) {
         for (long i = 1; i < local_size-1; i++){
             u_local_new[i] = u_newtime(u_local[i], u_local[i-1], u_local[i+1], k, tau, h);
         }
-
         if (myrank == 0){
             u_local_new[1] = 0;
         }
-
         if (myrank == size-1){
             u_local_new[local_size-2] = 0;
         }
 
+        //3. Swap
         double *tmp = u_local;
         u_local = u_local_new;
         u_local_new = tmp;
+    }
 
+    long start = myrank * array_size + (myrank < rem ? myrank : rem);
+    long owned_points = local_size-2;
+
+    //Display values
+    for (long g = 0; g < N; g += 5) {
+        if (g >= start && g < start + owned_points) {
+            long j = g - start + 1;
+            printf("%ld %.6f %.12f\n", g, g * h, u_local[j]);
+        }
     }
 
     free(u_local);
