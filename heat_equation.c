@@ -2,7 +2,7 @@
 #include<stdlib.h>
 #include<mpi.h>
 #include<math.h>
-#define PI = 3.14159265358979323846
+#define PI 3.14159265358979323846
 
 static double u_newtime(double u, double u_previous, double u_next, double k_const, double tau_const, double h_const){
     return u + (k_const * tau_const / (h_const * h_const)) * (u_next - 2 * u + u_previous);
@@ -123,11 +123,6 @@ int main(int argc, char *argv[]) {
             printf("%ld %.6f %.12f %.12f %.3e\n", g, g * h, u_local[j], ue, fabs(u_local[j] - ue));
         }
     }
-
-    //Exact solution
-    double u_local_exact[local_size-2];
-
-    for 
 
     free(u_local);
     free(u_local_new);
