@@ -125,13 +125,16 @@ int main(int argc, char *argv[]) {
     long start = myrank * array_size + (myrank < rem ? myrank : rem);
     long owned_points = local_size-2;
 
-    //Display values
+    //Display values for N = 51
+
+    if(N == 51){
     for (long g = 0; g < N; g += 5) {
         if (g >= start && g < start + owned_points) {
             long j = g - start + 1;
             double ue = u_exact(g * h, T, k);
             printf("%ld %.6f %.12f %.12f %.3e\n", g, g * h, u_local[j], ue, fabs(u_local[j] - ue));
         }
+    }
     }
 
     free(u_local);
