@@ -26,11 +26,21 @@ int main(int argc, char *argv[]) {
     MPI_Comm_rank(MPI_COMM_WORLD, &myrank);
 
     double k, tau, h, T;
-    T = 0.1;
     k = 1;
-    h = 0.02;
-    tau = 0.0002;
-    long N = 1/h + 1;
+    long N = 51;
+
+    if (argc > 1) N = atol(argv[1]);
+
+    if (N == 51){
+        T = 0.1;
+        h = 0.02;
+        tau = 0.0002;
+    } else {
+        T = 0.0001;
+        h = 1.0 / (N - 1);
+        tau = 1.0 / (2.0 * N * N);
+    }
+
     long array_size = N/size;
     long rem = N % size;
     long steps = (long)(T/tau + 0.5);
