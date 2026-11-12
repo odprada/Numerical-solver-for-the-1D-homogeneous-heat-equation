@@ -2,7 +2,7 @@
 #
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --job-name=integral
+#SBATCH --job-name=heat_equation
 #SBATCH --comment="Run mpi from config"
 #SBATCH --output=out.txt
 #SBATCH --error=error.txt
