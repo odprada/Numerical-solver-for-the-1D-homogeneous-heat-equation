@@ -2,7 +2,7 @@
 
 Parallel solver for the one-dimensional homogeneous heat equation
 
-$$\frac{\partial u}{\partial t} = k\,\frac{\partial^2 u}{\partial x^2}, \qquad x \in [0, 1]$$
+$$\frac{\partial u}{\partial t} = k\\frac{\partial^2 u}{\partial x^2}, \qquad x \in [0, 1]$$
 
 with initial condition `u(x, 0) = u0 = 1` and fixed zero Dirichlet boundary conditions `u(0, t) = u(1, t) = 0`.
 
