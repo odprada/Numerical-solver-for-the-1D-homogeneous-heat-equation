@@ -73,6 +73,10 @@ int main(int argc, char *argv[]) {
         u_local_new[local_size-1] = 0;
     }
 
+    //timer start
+    MPI_Barrier(MPI_COMM_WORLD);
+    double t_start = MPI_Wtime();
+
     for (long n = 0; n < steps; n++){
         //1. Exchange
         if (myrank % 2 != 0) {
@@ -122,19 +126,24 @@ int main(int argc, char *argv[]) {
         u_local_new = tmp;
     }
 
+    //Timer end
+    double local_t = MPI_Wtime() - t_start, max_t;
+    MPI_Reduce(&local_t, &max_t, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
+    if (myrank == 0 && N != 51) printf("%ld,%d,odd_even,%.6f\n", N, size, max_t);
+
     long start = myrank * array_size + (myrank < rem ? myrank : rem);
     long owned_points = local_size-2;
 
     //Display values for N = 51
 
     if(N == 51){
-    for (long g = 0; g < N; g += 5) {
-        if (g >= start && g < start + owned_points) {
-            long j = g - start + 1;
-            double ue = u_exact(g * h, T, k);
-            printf("%ld %.6f %.12f %.12f %.3e\n", g, g * h, u_local[j], ue, fabs(u_local[j] - ue));
+        for (long g = 0; g < N; g += 5) {
+            if (g >= start && g < start + owned_points) {
+                long j = g - start + 1;
+                double ue = u_exact(g * h, T, k);
+                printf("%ld %.6f %.12f %.12f %.3e\n", g, g * h, u_local[j], ue, fabs(u_local[j] - ue));
+            }
         }
-    }
     }
 
     free(u_local);
