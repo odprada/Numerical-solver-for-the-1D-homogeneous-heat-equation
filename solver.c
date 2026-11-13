@@ -30,6 +30,8 @@ int main(int argc, char *argv[]) {
     long N = 51;
 
     if (argc > 1) N = atol(argv[1]);
+    int mode = 1;
+    if (argc > 2) mode = atoi(argv[2]);
 
     if (N == 51){
         T = 0.1;
@@ -77,97 +79,99 @@ int main(int argc, char *argv[]) {
     MPI_Barrier(MPI_COMM_WORLD);
     double t_start = MPI_Wtime();
 
-    /*
+    
     //Naive o(p) communication
-    for (long n = 0; n < steps; n++){
-        //1. Exchange
-        if(myrank>0){
-            MPI_Send(&u_local[1], 1, MPI_DOUBLE, myrank-1, 1, MPI_COMM_WORLD);
-        }
-        if (myrank < size-1){
-            MPI_Recv(&u_local[local_size-1], 1, MPI_DOUBLE, myrank+1, 1, MPI_COMM_WORLD, &Status);
-        }
-        if (myrank < size-1){
+    if(mode == 0){
+        for (long n = 0; n < steps; n++){
+            //1. Exchange
+            if(myrank>0){
+                MPI_Send(&u_local[1], 1, MPI_DOUBLE, myrank-1, 1, MPI_COMM_WORLD);
+            }
+            if (myrank < size-1){
                 MPI_Recv(&u_local[local_size-1], 1, MPI_DOUBLE, myrank+1, 1, MPI_COMM_WORLD, &Status);
             }
-        if (myrank < size-1){
+            if (myrank < size-1){
                 MPI_Send(&u_local[local_size-2], 1, MPI_DOUBLE, myrank+1, 2, MPI_COMM_WORLD);
             }
-        if (myrank > 0){
+            if (myrank > 0){
                 MPI_Recv(&u_local[0], 1, MPI_DOUBLE, myrank-1, 2, MPI_COMM_WORLD, &Status);
             }
 
-        //2. Update
-        for (long i = 1; i < local_size-1; i++){
-            u_local_new[i] = u_newtime(u_local[i], u_local[i-1], u_local[i+1], k, tau, h);
-        }
-        if (myrank == 0){
-            u_local_new[1] = 0;
-        }
-        if (myrank == size-1){
-            u_local_new[local_size-2] = 0;
-        }
+            //2. Update
+            for (long i = 1; i < local_size-1; i++){
+                u_local_new[i] = u_newtime(u_local[i], u_local[i-1], u_local[i+1], k, tau, h);
+            }
+            if (myrank == 0){
+                u_local_new[1] = 0;
+            }
+            if (myrank == size-1){
+                u_local_new[local_size-2] = 0;
+            }
 
-        //3. Swap
-        double *tmp = u_local;
-        u_local = u_local_new;
-        u_local_new = tmp;
+            //3. Swap
+            double *tmp = u_local;
+            u_local = u_local_new;
+            u_local_new = tmp;
+        }
     }
-    */
+    
+    if(mode==1){
+        for (long n = 0; n < steps; n++){
+            //1. Exchange
+            if (myrank % 2 != 0) {
+                if (myrank > 0){
+                    MPI_Send(&u_local[1], 1, MPI_DOUBLE, myrank-1, 1, MPI_COMM_WORLD);
+                }
+                if (myrank > 0){
+                    MPI_Recv(&u_local[0], 1, MPI_DOUBLE, myrank-1, 2, MPI_COMM_WORLD, &Status);
+                }
+                if (myrank < size-1){
+                    MPI_Recv(&u_local[local_size-1], 1, MPI_DOUBLE, myrank+1, 1, MPI_COMM_WORLD, &Status);
+                }
+                if (myrank < size-1){
+                    MPI_Send(&u_local[local_size-2], 1, MPI_DOUBLE, myrank+1, 2, MPI_COMM_WORLD);
+                }
+            }
 
-     for (long n = 0; n < steps; n++){
-        //1. Exchange
-        if (myrank % 2 != 0) {
-            if (myrank > 0){
-                MPI_Send(&u_local[1], 1, MPI_DOUBLE, myrank-1, 1, MPI_COMM_WORLD);
+            else {
+                if (myrank < size-1){
+                    MPI_Recv(&u_local[local_size-1], 1, MPI_DOUBLE, myrank+1, 1, MPI_COMM_WORLD, &Status);
+                }
+                if (myrank < size-1){
+                    MPI_Send(&u_local[local_size-2], 1, MPI_DOUBLE, myrank+1, 2, MPI_COMM_WORLD);
+                }
+                if (myrank > 0){
+                    MPI_Send(&u_local[1], 1, MPI_DOUBLE, myrank-1, 1, MPI_COMM_WORLD);
+                }
+                if (myrank > 0){
+                    MPI_Recv(&u_local[0], 1, MPI_DOUBLE, myrank-1, 2, MPI_COMM_WORLD, &Status);
+                }
             }
-            if (myrank > 0){
-                MPI_Recv(&u_local[0], 1, MPI_DOUBLE, myrank-1, 2, MPI_COMM_WORLD, &Status);
-            }
-            if (myrank < size-1){
-                MPI_Recv(&u_local[local_size-1], 1, MPI_DOUBLE, myrank+1, 1, MPI_COMM_WORLD, &Status);
-            }
-            if (myrank < size-1){
-                MPI_Send(&u_local[local_size-2], 1, MPI_DOUBLE, myrank+1, 2, MPI_COMM_WORLD);
-            }
-        }
 
-        else {
-            if (myrank < size-1){
-                MPI_Recv(&u_local[local_size-1], 1, MPI_DOUBLE, myrank+1, 1, MPI_COMM_WORLD, &Status);
+            //2. Update
+            for (long i = 1; i < local_size-1; i++){
+                u_local_new[i] = u_newtime(u_local[i], u_local[i-1], u_local[i+1], k, tau, h);
             }
-            if (myrank < size-1){
-                MPI_Send(&u_local[local_size-2], 1, MPI_DOUBLE, myrank+1, 2, MPI_COMM_WORLD);
+            if (myrank == 0){
+                u_local_new[1] = 0;
             }
-            if (myrank > 0){
-                MPI_Send(&u_local[1], 1, MPI_DOUBLE, myrank-1, 1, MPI_COMM_WORLD);
+            if (myrank == size-1){
+                u_local_new[local_size-2] = 0;
             }
-            if (myrank > 0){
-                MPI_Recv(&u_local[0], 1, MPI_DOUBLE, myrank-1, 2, MPI_COMM_WORLD, &Status);
-            }
-        }
 
-        //2. Update
-        for (long i = 1; i < local_size-1; i++){
-            u_local_new[i] = u_newtime(u_local[i], u_local[i-1], u_local[i+1], k, tau, h);
+            //3. Swap
+            double *tmp = u_local;
+            u_local = u_local_new;
+            u_local_new = tmp;
         }
-        if (myrank == 0){
-            u_local_new[1] = 0;
-        }
-        if (myrank == size-1){
-            u_local_new[local_size-2] = 0;
-        }
-
-        //3. Swap
-        double *tmp = u_local;
-        u_local = u_local_new;
-        u_local_new = tmp;
     }
 
     //Timer end
     double local_t = MPI_Wtime() - t_start, max_t;
     MPI_Reduce(&local_t, &max_t, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
-    if (myrank == 0 && N != 51) printf("%ld,%d,odd_even,%.6f\n", N, size, max_t);
+    if (myrank == 0 && N != 51) {
+        printf("%ld,%d,%s,%.6f\n", N, size, (mode == 0 ? "naive" : "odd_even"), max_t);
+    }
 
     long start = myrank * array_size + (myrank < rem ? myrank : rem);
     long owned_points = local_size-2;
