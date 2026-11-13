@@ -10,5 +10,5 @@
 > results.txt
 
 for N in 2000 10000 50000; do
-      echo $N | mpirun -np 1 ./a.out | grep RESULT >> results.txt
-dones
+      mpirun -np 1 ./a.out $N >> results.txt
+done
