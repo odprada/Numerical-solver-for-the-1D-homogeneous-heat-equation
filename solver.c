@@ -77,7 +77,45 @@ int main(int argc, char *argv[]) {
     MPI_Barrier(MPI_COMM_WORLD);
     double t_start = MPI_Wtime();
 
+    /*
+    //Naive o(p) communication
     for (long n = 0; n < steps; n++){
+        //1. Exchange
+        if(myrank>0){
+            MPI_Send(&u_local[1], 1, MPI_DOUBLE, myrank-1, 1, MPI_COMM_WORLD);
+        }
+        if (myrank < size-1){
+            MPI_Recv(&u_local[local_size-1], 1, MPI_DOUBLE, myrank+1, 1, MPI_COMM_WORLD, &Status);
+        }
+        if (myrank < size-1){
+                MPI_Recv(&u_local[local_size-1], 1, MPI_DOUBLE, myrank+1, 1, MPI_COMM_WORLD, &Status);
+            }
+        if (myrank < size-1){
+                MPI_Send(&u_local[local_size-2], 1, MPI_DOUBLE, myrank+1, 2, MPI_COMM_WORLD);
+            }
+        if (myrank > 0){
+                MPI_Recv(&u_local[0], 1, MPI_DOUBLE, myrank-1, 2, MPI_COMM_WORLD, &Status);
+            }
+
+        //2. Update
+        for (long i = 1; i < local_size-1; i++){
+            u_local_new[i] = u_newtime(u_local[i], u_local[i-1], u_local[i+1], k, tau, h);
+        }
+        if (myrank == 0){
+            u_local_new[1] = 0;
+        }
+        if (myrank == size-1){
+            u_local_new[local_size-2] = 0;
+        }
+
+        //3. Swap
+        double *tmp = u_local;
+        u_local = u_local_new;
+        u_local_new = tmp;
+    }
+    */
+
+     for (long n = 0; n < steps; n++){
         //1. Exchange
         if (myrank % 2 != 0) {
             if (myrank > 0){
