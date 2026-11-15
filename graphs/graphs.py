@@ -2,7 +2,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from pathlib import Path
 
-RESULTS = Path(__file__).resolve().parent / "results.csv"
+GRAPH_DIR = Path(__file__).resolve().parent
+RESULTS = GRAPH_DIR.parent / "results.csv"
 df = pd.read_csv(RESULTS)
 
 df = df.sort_values(['method', 'N', 'p']).reset_index(drop=True)
