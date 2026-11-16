@@ -4,8 +4,8 @@
 #include<math.h>
 #define PI 3.14159265358979323846
 
-static double u_newtime(double u, double u_previous, double u_next, double k_const, double tau_const, double h_const){
-    return u + (k_const * tau_const / (h_const * h_const)) * (u_next - 2 * u + u_previous);
+static double u_newtime(double u, double u_previous, double u_next, double r_const){
+    return u + r_const * (u_next - 2 * u + u_previous);
 }
 
 static double u_exact(double x, double t, double k_const) {
@@ -37,10 +37,12 @@ int main(int argc, char *argv[]) {
         T = 0.1;
         h = 0.02;
         tau = 0.0002;
+        r = k * tau / (h * h);
     } else {
         T = 0.0001;
         h = 1.0 / (N - 1);
         tau = 1.0 / (2.0 * N * N);
+        r = k * tau / (h * h);
     }
 
     long array_size = N/size;
@@ -99,7 +101,7 @@ int main(int argc, char *argv[]) {
 
             //2. Update
             for (long i = 1; i < local_size-1; i++){
-                u_local_new[i] = u_newtime(u_local[i], u_local[i-1], u_local[i+1], k, tau, h);
+                u_local_new[i] = u_newtime(u_local[i], u_local[i-1], u_local[i+1], r);
             }
             if (myrank == 0){
                 u_local_new[1] = 0;
@@ -150,7 +152,7 @@ int main(int argc, char *argv[]) {
 
             //2. Update
             for (long i = 1; i < local_size-1; i++){
-                u_local_new[i] = u_newtime(u_local[i], u_local[i-1], u_local[i+1], k, tau, h);
+                u_local_new[i] = u_newtime(u_local[i], u_local[i-1], u_local[i+1], r);
             }
             if (myrank == 0){
                 u_local_new[1] = 0;
