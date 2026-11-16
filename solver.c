@@ -25,7 +25,7 @@ int main(int argc, char *argv[]) {
     MPI_Comm_size(MPI_COMM_WORLD, &size);
     MPI_Comm_rank(MPI_COMM_WORLD, &myrank);
 
-    double k, tau, h, T;
+    double k, tau, h, T, r;
     k = 1;
     long N = 51;
 
