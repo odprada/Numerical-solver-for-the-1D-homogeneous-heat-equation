@@ -8,7 +8,7 @@
 #SBATCH --output=out_2.txt
 #SBATCH --error=error_2.txt
 
-echo "N,p,method,time" > results_2.txt
+echo "N,p,method,T,steps,time" > results_2.txt
 
 for p in $(seq 2 6); do
     for N in 2000 10000 50000 1000000; do

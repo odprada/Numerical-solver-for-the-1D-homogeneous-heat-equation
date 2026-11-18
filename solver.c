@@ -25,13 +25,14 @@ int main(int argc, char *argv[]) {
     MPI_Comm_size(MPI_COMM_WORLD, &size);
     MPI_Comm_rank(MPI_COMM_WORLD, &myrank);
 
-    double k, tau, h, T, r;
+    double k, tau, h, T, r, T_arg;
     k = 1;
     long N = 51;
 
     if (argc > 1) N = atol(argv[1]);
     int mode = 1;
     if (argc > 2) mode = atoi(argv[2]);
+    if (argc > 3) T_arg = atof(argv[3]);
 
     if (N == 51){
         T = 0.1;
@@ -39,7 +40,7 @@ int main(int argc, char *argv[]) {
         tau = 0.0002;
         r = k * tau / (h * h);
     } else {
-        T = 0.0001;
+        T = T_arg;
         h = 1.0 / (N - 1);
         tau = 1.0 / (2.0 * N * N);
         r = k * tau / (h * h);

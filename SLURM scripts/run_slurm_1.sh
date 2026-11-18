@@ -8,7 +8,7 @@
 #SBATCH --output=out.txt
 #SBATCH --error=error.txt
 
-echo "N,p,method,time" > results.txt
+echo "N,p,method,T,steps,time" > results.txt
 
 for N in 2000 10000 50000 1000000; do
     mpirun -np 1 ./a.out $N 1 >> results.txt
