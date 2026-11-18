@@ -26,6 +26,7 @@ int main(int argc, char *argv[]) {
     MPI_Comm_rank(MPI_COMM_WORLD, &myrank);
 
     double k, tau, h, T, r, T_arg;
+    T_arg = 0.1;
     k = 1;
     long N = 51;
 
@@ -61,6 +62,7 @@ int main(int argc, char *argv[]) {
 
     for (long i=1; i<local_size-1; i++){
         u_local[i] = 1;
+        u_local_new[i] = 1;
     }
 
     //Zero boundary conditions
@@ -173,7 +175,7 @@ int main(int argc, char *argv[]) {
     double local_t = MPI_Wtime() - t_start, max_t;
     MPI_Reduce(&local_t, &max_t, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
     if (myrank == 0 && N != 51) {
-        printf("%ld,%d,%s,%.6f\n", N, size, (mode == 0 ? "naive" : "odd_even"), max_t);
+        printf("%ld,%d,%s,%g,%ld,%.6f\n", N, size, (mode == 0 ? "naive" : "odd_even"), T, steps, max_t);
     }
 
     long start = myrank * array_size + (myrank < rem ? myrank : rem);
