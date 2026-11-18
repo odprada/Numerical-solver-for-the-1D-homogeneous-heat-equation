@@ -49,7 +49,7 @@ at the 11 points `x = 0, 0.1, ..., 1.0` at `T = 0.1` (with `k = 1`, `h = 0.02`, 
 - **CPU:** Dual-socket Intel Xeon 5160 @ 3.00 GHz (2 cores per socket, 4 physical cores per node, no hyper-threading)
 - **Cache:** 32 KiB L1d / 32 KiB L1i per core; 4 MiB L2 per socket (8 MiB total per node)
 - **Cluster Configuration:** 3 compute nodes (12 cores total), Slurm workload manager
-- **Compilation:** `mpicc solver.c -lm` (default optimization)
+- **Compilation:** First run: `mpicc solver.c -lm` (N = 2000, 10000, 50000). Second run: `mpicc -O3  -march=core2 solver.c -lm` (N = 2000, 10000, 50000, 250000, 1000000)
 
 ## Conclusions
 
@@ -60,3 +60,9 @@ at the 11 points `x = 0, 0.1, ..., 1.0` at `T = 0.1` (with `k = 1`, `h = 0.02`, 
 3. **Impact of Grid Size (`N`) and Complexity.** Because the explicit stability criterion forces `tau = O(1 / N^2)`, the number of time steps grows as `O(N^2)` and total grid updates scale as `O(N^3)`, while each process still only exchanges two numbers (`double`) per step (`O(1)` per step). Moving from `N = 2,000` to `N = 50,000` gives each core vastly more computation relative to communication overhead, resulting in much better parallel efficiency.
 
 4. **Naive (`O(p)`) vs. Odd-Even (`O(1)`) Exchange.** Pairing odd and even processes guarantees there are no deadlocks and keeps communication time per step constant (`O(1)`) as `p` grows. For small 8-byte messages (`double`), standard `MPI_Send` can partially hide the `O(p)` slowdown of the naive approach because MPI buffers tiny messages internally.
+
+## Notes
+
+1. To guarantee reasonable computing times, T was reduced every time N was increased.
+
+2. During the second run, for simplicity, p=1 was only run once using the optimized communication mode, hence the point (1,1) is missing from the naive communication speedup graph.
