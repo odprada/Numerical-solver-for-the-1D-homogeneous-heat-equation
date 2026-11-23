@@ -65,4 +65,4 @@ at the 11 points `x = 0, 0.1, ..., 1.0` at `T = 0.1` (with `k = 1`, `h = 0.02`, 
 
 1. To guarantee reasonable computing times, T was reduced every time N was increased.
 
-2. During the second run, for simplicity, p=1 was only run once using the optimized communication mode, hence the point (1,1) is missing from the naive communication speedup graph.
+2. During the second run, for simplicity, `p = 1` was only run once using the optimized communication mode, hence the point (1,1) is missing from the naive communication speedup graph.
