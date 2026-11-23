@@ -49,7 +49,7 @@ at the 11 points `x = 0, 0.1, ..., 1.0` at `T = 0.1` (with `k = 1`, `h = 0.02`, 
 - **CPU:** Dual-socket Intel Xeon 5160 @ 3.00 GHz (2 cores per socket, 4 physical cores per node, no hyper-threading)
 - **Cache:** 32 KiB L1d / 32 KiB L1i per core; 4 MiB L2 per socket (8 MiB total per node)
 - **Cluster Configuration:** 3 compute nodes (12 cores total), Slurm workload manager
-- **Compilation:** First run: `mpicc solver.c -lm` (N = 2000, 10000, 50000). Second run: `mpicc -O3  -march=core2 solver.c -lm` (N = 2000, 10000, 50000, 250000, 1000000)
+- **Compilation:** First run: `mpicc solver.c -lm` (`N = 2000, 10000, 50000`). Second run: `mpicc -O3  -march=core2 solver.c -lm` (`N = 2000, 10000, 50000, 250000, 1000000`)
 
 ## Conclusions
 
